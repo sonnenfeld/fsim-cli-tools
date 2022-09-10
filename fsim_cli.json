@@ -1,0 +1,46 @@
+{
+    "DTTP_XML": "C:\\Users\\Christian\\Desktop\\charts_flp\\dttp\\d-TPP_Metafile.xml",
+    "DTTP_PDF": "C:\\Users\\Chris\\Desktop\\charts\\dttp\\pdfs",
+    "CG_CFGS": {
+        "p28u": {
+            "empty_weight": 1896,
+            "empty_moment": 167227,
+            "plt_frnt_pssnger": [
+                420,
+                34
+            ],
+            "fuel": [
+                435,
+                42
+            ],
+            "aft_pssngrs": [
+                335,
+                40
+            ],
+            "baggage": [
+                190,
+                27
+            ]
+        },
+        "p28a": {
+            "empty_weight": 1300,
+            "empty_moment": 110500,
+            "plt_frnt_pssnger": [
+                420,
+                34
+            ],
+            "fuel": [
+                295,
+                28.5
+            ],
+            "aft_pssngrs": [
+                335,
+                33.7
+            ],
+            "baggage": [
+                195,
+                28.5
+            ]
+        }
+    }
+}
