@@ -1,6 +1,7 @@
 {
     "DTTP_XML": "C:\\Users\\Christian\\Desktop\\charts_flp\\dttp\\d-TPP_Metafile.xml",
-    "DTTP_PDF": "C:\\Users\\Chris\\Desktop\\charts\\dttp\\pdfs",
+    "DTTP_PDF": "C:\\Users\\Christian\\Desktop\\charts_flp\\dttp\\pdf",
+    "SUMATRA": "C:\\Users\\Christian\\AppData\\Local\\SumatraPDF\\SumatraPDF.exe",
     "CG_CFGS": {
         "p28u": {
             "empty_weight": 1896,

@@ -387,7 +387,8 @@ def main():
             print("[{}] {}: {}, Changed:{}".format(*res))
         if len(args.dttp_pdf) > 2:
             for res in result:
-                subprocess.Popen(os.path.join(cfg["DTTP_PDF"], res[2]), shell=True)
+                cmd = "{:s} {:s}".format(cfg["SUMATRA"], os.path.join(cfg["DTTP_PDF"], res[2]))
+                subprocess.Popen(cmd, shell=True)
 
 if __name__ == "__main__":
     main()
