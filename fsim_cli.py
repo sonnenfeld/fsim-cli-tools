@@ -386,8 +386,12 @@ def main():
         for res in result:
             print("[{}] {}: {}, Changed:{}".format(*res))
         if len(args.dttp_pdf) > 2:
-            for res in result:
-                cmd = "{:s} {:s}".format(cfg["SUMATRA"], os.path.join(cfg["DTTP_PDF"], res[2]))
+            for i, res in enumerate(result):
+                # each time this cmd is run, open a new window
+                if i == 0:
+                    cmd = "{:s} -new-window {:s}".format(cfg["SUMATRA"], os.path.join(cfg["DTTP_PDF"], res[2]))
+                else:
+                    cmd = "{:s} {:s}".format(cfg["SUMATRA"], os.path.join(cfg["DTTP_PDF"], res[2]))
                 subprocess.Popen(cmd, shell=True)
 
 if __name__ == "__main__":
