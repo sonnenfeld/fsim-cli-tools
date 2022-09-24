@@ -1,6 +1,8 @@
 {
-    "DTTP_XML": "C:\\Users\\Christian\\Desktop\\charts_flp\\dttp\\d-TPP_Metafile.xml",
-    "DTTP_PDF": "C:\\Users\\Christian\\Desktop\\charts_flp\\dttp\\pdf",
+    "DTTP_XML": "C:\\Users\\Christian\\Desktop\\charts_flp\\dtpp\\d-TPP_Metafile.xml",
+    "DTTP_PDF": "C:\\Users\\Christian\\Desktop\\charts_flp\\dtpp\\pdf",
+    "DCS_XML": "C:\\Users\\Christian\\Desktop\\charts_flp\\dcs\\afd_08Sep2022.xml",
+    "DCS_PDF": "C:\\Users\\Christian\\Desktop\\charts_flp\\dcs",
     "SUMATRA": "C:\\Users\\Christian\\AppData\\Local\\SumatraPDF\\SumatraPDF.exe",
     "CG_CFGS": {
         "p28u": {

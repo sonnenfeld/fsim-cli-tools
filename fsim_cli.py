@@ -55,10 +55,15 @@ def _get_args():
                         type = float,
                         help = "Calculate corrected distance from DME."
                         )
-    parser.add_argument("--dttp-pdf",
+    parser.add_argument("--dtpp-pdf",
                         metavar=("AIRPORT_ICAO","FILTERS"),
                         nargs="+",
-                        help = "Find all TPP documents related to airport in a local d-TTP installation."
+                        help = "Find all d-TPP documents related to airport in a local d-TTP installation."
+                        )
+    parser.add_argument("--dcs-pdf",
+                        metavar=("AIRPORT_ICAO"),
+                        nargs="+",
+                        help="Find chart supplement given an airport ICAO code."
                         )
     return parser.parse_args()
 
@@ -97,6 +102,23 @@ def _triag(hor:float=None, vert:float=None, angle:float=None):
         raise ValueError("Function accepts exactly two arguments.")
 
     return result
+
+def dttp_pdf(args, cfg):
+    if len(args.dtpp_pdf) > 1:
+        result = get_pdfs_from_dtpp_xml(cfg, args.dtpp_pdf[0], [r.upper() for r in args.dtpp_pdf[1:]])
+    else:
+        result = get_pdfs_from_dtpp_xml(cfg, args.dtpp_pdf[0])
+    for res in result:
+        print("[{}] {}: {}, Changed:{}".format(*res))
+    if len(args.dtpp_pdf) > 2:
+        for i, res in enumerate(result):
+                # each time this cmd is run, open a new window
+            if (i == 0) and "n" in args.dtpp_pdf[2].lower():
+                cmd = "{:s} -new-window {:s}".format(cfg["SUMATRA"], os.path.join(cfg["DTTP_PDF"], res[2]))
+            else:
+                cmd = "{:s} {:s}".format(cfg["SUMATRA"], os.path.join(cfg["DTTP_PDF"], res[2]))
+            subprocess.Popen(cmd, shell=True)
+
 
 def interp_lin(c1:tuple, c2:tuple, x:float):
     # pylint: disable=invalid-name; shorter names are clearer here
@@ -258,7 +280,19 @@ def compute_cg(cfg, ac_icao, **kwargs):
 
     return center_grav, ac_total_moment, ac_total_weight
 
-def get_pdfs_from_xml(cfg:dict, airport_icao:str, code_filters:list=None):
+def get_pdfs_from_dcs_xml(cfg:dict, airport_icao:str):
+    tree = ET.parse(cfg["DCS_XML"])
+    root = tree.getroot()
+    if len(airport_icao) == 3:
+        cs_filename = root.findall("./location/airport/[aptid='{:s}']/pages/pdf".format(airport_icao.upper()))
+    elif len(airport_icao) == 4:
+        # omit first character
+        cs_filename = root.findall("./location/airport/[aptid='{:s}']/pages/pdf".format(airport_icao[1:].upper()))
+    else:
+        raise ValueError("Airport ICAO code must have 3 or 4 letters. Code passed was {:s}".format(airport_icao))
+    return cs_filename[0].text
+
+def get_pdfs_from_dtpp_xml(cfg:dict, airport_icao:str, code_filters:list=None):
     """
     Parse the xml file provided with the FAA d-TTP publication
     and return all procedure pdfs for a given airport ICAO code.
@@ -378,21 +412,18 @@ def main():
     if args.slant_corr is not None:
         result = slant_correction(*args.slant_corr)
         print("Distance: {:.1f}NM, Height AGL: {:.0f}ft".format(result, args.slant_corr[1]))
-    if args.dttp_pdf is not None:
-        if len(args.dttp_pdf) > 1:
-            result = get_pdfs_from_xml(cfg, args.dttp_pdf[0], [r.upper() for r in args.dttp_pdf[1:]])
+    if args.dtpp_pdf is not None:
+        dttp_pdf(args, cfg)
+    if args.dcs_pdf is not None:
+        dcs_pdf = get_pdfs_from_dcs_xml(cfg, args.dcs_pdf[0])
+        if len(args.dcs_pdf) > 1:
+            if "n" in args.dcs_pdf[1].lower():
+                cmd = "{:s} -new-window {:s}".format(cfg["SUMATRA"], os.path.join(cfg["DCS_PDF"], dcs_pdf))
+            else:
+                cmd = "{:s} {:s}".format(cfg["SUMATRA"], os.path.join(cfg["DCS_PDF"], dcs_pdf))
+            subprocess.Popen(cmd, shell=True)
         else:
-            result = get_pdfs_from_xml(cfg, args.dttp_pdf[0])
-        for res in result:
-            print("[{}] {}: {}, Changed:{}".format(*res))
-        if len(args.dttp_pdf) > 2:
-            for i, res in enumerate(result):
-                # each time this cmd is run, open a new window
-                if i == 0:
-                    cmd = "{:s} -new-window {:s}".format(cfg["SUMATRA"], os.path.join(cfg["DTTP_PDF"], res[2]))
-                else:
-                    cmd = "{:s} {:s}".format(cfg["SUMATRA"], os.path.join(cfg["DTTP_PDF"], res[2]))
-                subprocess.Popen(cmd, shell=True)
+            print(dcs_pdf)
 
 if __name__ == "__main__":
     main()
