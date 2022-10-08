@@ -189,8 +189,9 @@ def baro_height(P:float, T_ref:float, P_ref:float, h_ref:float, lapse_rate:float
     """
     T_ref += 273.15 # to Kelvin
     if math.isclose(lapse_rate, 0, rel_tol=1e-6, abs_tol=1e-8):
-        raise NotImplementedError("TODO: Implement zero lapse formula")
-    dh = 1/lapse_rate*( T_ref * (P/P_ref)**(-(R*lapse_rate)/(g*M)) - T_ref)
+        dh = -R*T_ref/(g*M)*math.log(P/P_ref)
+    else:
+        dh = 1/lapse_rate*( T_ref * (P/P_ref)**(-(R*lapse_rate)/(g*M)) - T_ref)
 
     return dh + h_ref
 
