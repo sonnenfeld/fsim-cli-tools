@@ -37,30 +37,36 @@ def _get_args():
                         type = __parse_cg_types,
                         help = "Compute CG, Moment and total mass."
                         )
-    parser.add_argument("--slope-gnd",
+    parser.add_argument("-sg", "--slope-gnd",
                         metavar=("DME","AGL","ANGLE"),
-                        nargs=3,
+                        nargs = 3,
                         type = __parse_cg_types,
                         help = "Compute missing parameter for ground based triangle."
                         )
-    parser.add_argument("--slope-spd",
+    parser.add_argument("-ss", "--slope-spd",
                         metavar=("GS","FPM","ANGLE"),
-                        nargs=3,
+                        nargs = 3,
                         type = __parse_cg_types,
                         help = "Compute missing parameter for speed based triangle."
                         )
+    parser.add_argument("-tod", "--top-of-descent",
+                        metavar=("ALT", "ANGLE"),
+                        nargs = 2,
+                        type = float,
+                        help = "Calculate top of descent given the desired glidepath angle and altitude to descent."
+                        )
     parser.add_argument("--slant-corr",
                         metavar=("DME","AGL"),
-                        nargs=2,
+                        nargs = 2,
                         type = float,
                         help = "Calculate corrected distance from DME."
                         )
-    parser.add_argument("--dtpp-pdf",
+    parser.add_argument("-tpp", "--dtpp-pdf",
                         metavar=("AIRPORT_ICAO","FILTERS"),
                         nargs="+",
                         help = "Find all d-TPP documents related to airport in a local d-TTP installation."
                         )
-    parser.add_argument("--dcs-pdf",
+    parser.add_argument("-cs", "--dcs-pdf",
                         metavar=("AIRPORT_ICAO"),
                         nargs="+",
                         help="Find chart supplement given an airport ICAO code."
@@ -425,6 +431,9 @@ def main():
             subprocess.Popen(cmd, shell=True)
         else:
             print(dcs_pdf)
+    if args.top_of_descent is not None:
+        tod = _triag(None, args.top_of_descent[0], args.top_of_descent[1])*FEET_TO_NM
+        print("TOD {:.1f}NM".format(tod))
 
 if __name__ == "__main__":
     main()
