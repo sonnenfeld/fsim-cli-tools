@@ -320,6 +320,8 @@ def get_pdfs_from_dtpp_xml(cfg:dict, airport_icao:str, code_filters:list=None):
     tree = ET.parse(cfg["DTTP_XML"])
     root = tree.getroot()
     airport_records = root.findall("./state_code/city_name/airport_name/[@icao_ident='{:s}']".format(airport_icao.upper()))
+    if len(airport_records) == 0:
+        airport_records = root.findall("./state_code/city_name/airport_name/[@apt_ident='{:s}']".format(airport_icao.upper()))
     record_list = []
     for record in airport_records[0]:
         chart_code = record.find("chart_code").text
