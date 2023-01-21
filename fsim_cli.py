@@ -71,6 +71,13 @@ def _get_args():
                         nargs="+",
                         help="Find chart supplement given an airport ICAO code."
                         )
+    parser.add_argument("--interp-1d", "-i",
+                        metavar=("X1", "Y1", "X2", "Y2", "X"),
+                        nargs=5,
+                        type=float,
+                        help="Linear interpolation between (X1,Y1) and (X2, Y2) for point X."
+                        )
+
     return parser.parse_args()
 
 def _triag(hor:float=None, vert:float=None, angle:float=None):
@@ -436,6 +443,9 @@ def main():
     if args.top_of_descent is not None:
         tod = _triag(None, args.top_of_descent[0], args.top_of_descent[1])*FEET_TO_NM
         print("TOD {:.1f}NM".format(tod))
+    if args.interp_1d is not None:
+        y_interp = interp_lin((args.interp_1d[0], args.interp_1d[1]), (args.interp_1d[2], args.interp_1d[3]), args.interp_1d[4])
+        print("Interp. 1D: xi={:f}, yi={:f}".format(args.interp_1d[4], y_interp))
 
 if __name__ == "__main__":
     main()
