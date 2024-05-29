@@ -15,8 +15,9 @@ import subprocess
 STD_CFG = os.path.splitext(__file__)[0]+".json"
 
 M = 0.0289644 # molar mass of Earth's air kg/mol
-g = 9.80665 # gravitational acceleration: m/s**2
+grav_accl = 9.80665 # gravitational acceleration: m/s**2
 R = 8.3144598 # universal gas constant:  J/(mol·K)
+RS = 287.058 # specific gas constant for dry air: J/(kg*K)
 
 METERS_TO_FEET = 3.28084 # ft/m
 FEET_TO_NM = 1.645788e-4 # NM/ft
@@ -177,7 +178,7 @@ def conv_vor_hdg(mag_crs:float, mag_dsplcmnt:float, vor_dsplcmnt:float):
     """
     return mag_crs + (mag_dsplcmnt - vor_dsplcmnt)
 
-def baro_height(P:float, T_ref:float, P_ref:float, h_ref:float, lapse_rate:float=-6.5e-3):
+def baro_height(P:float, T_ref:float, P_ref:float, h_ref:float, lapse_rate:float=6.5e-3):
     """
     Use barometric formula to compute height above MSL.
 
@@ -202,13 +203,13 @@ def baro_height(P:float, T_ref:float, P_ref:float, h_ref:float, lapse_rate:float
     """
     T_ref += 273.15 # to Kelvin
     if math.isclose(lapse_rate, 0, rel_tol=1e-6, abs_tol=1e-8):
-        dh = -R*T_ref/(g*M)*math.log(P/P_ref)
+        dh = -R*T_ref/(grav_accl*M)*math.log(P/P_ref)
     else:
-        dh = 1/lapse_rate*( T_ref * (P/P_ref)**(-(R*lapse_rate)/(g*M)) - T_ref)
+        dh = 1/lapse_rate*( T_ref * (P/P_ref)**(-(R*lapse_rate)/(grav_accl*M)) - T_ref)
 
     return dh + h_ref
 
-def baro_prs(h:float, T_ref:float, P_ref:float, h_ref:float, lapse_rate:float=-6.5e-3):
+def baro_prs(h:float, T_ref:float, P_ref:float, h_ref:float, lapse_rate:float=6.5e-3):
     """
     Computes barometric pressure at a desired height above ground level.
 
@@ -236,10 +237,10 @@ def baro_prs(h:float, T_ref:float, P_ref:float, h_ref:float, lapse_rate:float=-6
     P_ref *= 100 # to Pascal
 
     if math.isclose(lapse_rate, 0, rel_tol=1e-6, abs_tol=1e-8):
-        P = -g*M*(h-h_ref)/(R*T_ref)
+        P = -grav_accl*M*(h-h_ref)/(R*T_ref)
         P = P_ref*math.exp(P)
     else:
-        P = ((T_ref+lapse_rate*(h-h_ref))/T_ref)**(-(g*M)/(R*lapse_rate))
+        P = ((T_ref+lapse_rate*(h-h_ref))/T_ref)**(-(grav_accl*M)/(R*lapse_rate))
         P *= P_ref
 
     P /= 100 # to millibar / hPa
