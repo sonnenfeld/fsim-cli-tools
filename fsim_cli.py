@@ -66,6 +66,12 @@ def _get_args():
                         nargs="+",
                         help = "Find all d-TPP documents related to airport in a local d-TTP installation."
                         )
+    parser.add_argument("-tps", "--dtpp-region-type",
+                        metavar=("STATE","TYPE","STR"),
+                        nargs=3,
+                        help = "In a region, find all IAPs of a specific type."
+                        )
+    
     parser.add_argument("-cs", "--dcs-pdf",
                         metavar=("AIRPORT_ICAO"),
                         nargs="+",
@@ -408,10 +414,50 @@ def slope_spd(**kwargs):
     kwargs["gs"] /= KNOTS_TO_FPM
     return kwargs
 
+def search_dtpp(cfg:dict, region:str, chart_code:str, search_str:str):
+    """
+    Search d-TPP publication for a specific procedure type and return all
+    procedures whose names contain a specified string.
+
+    Parameters
+    ----------
+    cfg : dict
+        Program config
+    region : str
+        Full name of US state, i.e. ALASKA or CALIFORNIA
+    chart_code : str
+        Desired procedure type, i.e. 'IAP'
+    search_str : str
+        Procedure names containing search_str will be returned
+    """
+    result_list = []
+
+    # read xml file
+    tree = ET.parse(cfg["DTTP_XML"])
+    root = tree.getroot()
+
+    # get all airports for US state
+    state_records = root.findall(f"./state_code/[@state_fullname='{region.upper():s}']")[0]
+    airports = state_records.findall("./city_name/airport_name")
+
+    for airport in airports:
+        # iterate of airports
+        for record in airport:
+            # iterate over all records of an airport
+            current_chart_code = record.find("chart_code")
+            if chart_code.upper() == current_chart_code.text.upper():
+                # chart matches desired type, i.e. IAP (instrument approach procedure)
+                current_chart_name = record.find("chart_name")
+                if search_str in current_chart_name.text:
+                    # procedure name contains desired string, i.e. 'NDB'
+                    result_list.append(f"{airport.attrib['icao_ident']:s} {current_chart_name.text}")
+
+    return result_list
+
 def main():
     # pylint: disable=missing-function-docstring
     args = _get_args()
-    with open(STD_CFG, "r") as f:
+    with open(STD_CFG, "r", encoding="utf-8") as f:
         cfg = json.load(f)
 
     if args.compute_cg is not None:
@@ -446,6 +492,12 @@ def main():
     if args.interp_1d is not None:
         y_interp = interp_lin((args.interp_1d[0], args.interp_1d[1]), (args.interp_1d[2], args.interp_1d[3]), args.interp_1d[4])
         print("Interp. 1D: xi={:f}, yi={:f}".format(args.interp_1d[4], y_interp))
+    if args.dtpp_region_type is not None:
+        result_list = search_dtpp(cfg, *args.dtpp_region_type)
+        if len(result_list) == 0:
+            print("Nothing found.")
+        else:
+            print("\n".join(result_list))
 
 if __name__ == "__main__":
     main()
