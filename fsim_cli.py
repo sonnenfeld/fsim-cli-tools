@@ -17,7 +17,6 @@ STD_CFG = os.path.splitext(__file__)[0]+".json"
 M = 0.0289644 # molar mass of Earth's air kg/mol
 grav_accl = 9.80665 # gravitational acceleration: m/s**2
 R = 8.3144598 # universal gas constant:  J/(mol·K)
-RS = 287.058 # specific gas constant for dry air: J/(kg*K)
 
 METERS_TO_FEET = 3.28084 # ft/m
 FEET_TO_NM = 1.645788e-4 # NM/ft
